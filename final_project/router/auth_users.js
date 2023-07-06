@@ -31,7 +31,7 @@ regd_users.post("/login", (req,res) => {
         }, 'access', { expiresIn: 60 * 60 });
 
         req.session.authorization = {
-            accessToken
+            accessToken, username
         }
         return res.status(200).send("Customer successfully logged in");
     } else {
@@ -43,7 +43,20 @@ regd_users.post("/login", (req,res) => {
 regd_users.put("/auth/review/:isbn", (req, res) => {
     let isbn = req.params.isbn;
     let review = req.query.review;
+    let username = req.session.authorization.username;
 
+    books[isbn].reviews[username] = review;
+
+    return res.status(200).send("Review posted successfully");
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    let isbn = req.params.isbn;
+    let username = req.session.authorization.username;
+
+    delete books[isbn].reviews[username];
+
+    return res.status(200).send("Review deleted successfully");
 });
 
 module.exports.authenticated = regd_users;
